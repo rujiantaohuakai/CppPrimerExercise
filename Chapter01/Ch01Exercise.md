@@ -417,14 +417,57 @@ int main()
 
 > 如果输入的所有值都是相等的，本节的程序会输出什么？如果没有重复值，输出又会是怎样的？
 
+解答：
+如果输入值都相等，会在最后输出一次，如下：
+```
+输入：
+1 1 1 1 1 1 ^Z
+输出：
+1 occurs 6 times
+```
 
+如果没用重复，每次都会输出一次，如下：
+```
+输入：
+1 2 3 4 5 6 ^Z
+输出：
+1 occurs 1 times
+2 occurs 1 times
+3 occurs 1 times
+4 occurs 1 times
+5 occurs 1 times
+6 occurs 1 times
+```
 
 ## 练习1.18
 
 > 编译并运行本节的程序，给它输入全都相等的值。再次运行程序，输入没有重复的值。
 
+解答：
 ```c++
+#include <iostream>
 
+int main()
+{
+    int currVal = 0, val = 0;
+    if(std::cin >> currVal){
+        int cnt = 1;
+        while(std::cin >> val){
+            if(val == currVal){
+                cnt++;
+            }
+            else{
+                std::cout << currVal << " occurs "
+                          << cnt << " times" << std::endl;
+                currVal = val;
+                cnt = 1;
+            }
+        }
+        std::cout << currVal << " occurs "
+                  << cnt << " times" << std::endl;
+    }
+    return 0;
+}
 ```
 
 ## 练习1.19
@@ -432,49 +475,181 @@ int main()
 > 修改你为1.4.1节练习1.11（第11页）所编写的程序（打印一个范围内的数），使其能处理用户输入的第一个数比第二个数小的情况。
 
 ```c++
+#include <iostream>
 
+int main()
+{
+    int v1, v2;
+    std::cout << "Enter two integers: ";
+    std::cin >> v1 >> v2;
+    if(v1 > v2){
+        int temp = v1;
+        v1 = v2;
+        v2 = temp;
+    }
+
+    while(v1 <= v2){
+        std::cout << v1 << " ";
+        v1++;
+    }
+}
 ```
 
-
+之后从Powershell换成CMD
 ## 练习1.20
 
 > 在网站http://www.informit.com/title/032174113 上，第1章的代码目录包含了头文件 Sales_item.h。将它拷贝到你自己的工作目录中。用它编写一个程序，读取一组书籍销售记录，将每条记录打印到标准输出上。
 
+解答：
 ```c++
+#include <iostream>
+#include "Sales_item.h"
 
+int main()
+{
+    Sales_item item;
+    while(std::cin >> item){
+        std::cout << item << std::endl;
+    }
+    return 0;
+}
+```
+
+CMD中输入：
+```
+g++ exercise_1.20.cpp -o exercise_1.20.exe
+exercise_1.20 <book_sales.txt >e1.20outfile.txt
+```
+
+e1.20outfile.txt中输出：
+```
+0-201-70353-X 4 99.96 24.99
+0-201-82470-1 4 181.56 45.39
+0-201-88954-4 2 30 15
+0-201-88954-4 5 60 12
+0-201-88954-4 7 84 12
+0-201-88954-4 2 24 12
+0-399-82477-1 2 90.78 45.39
+0-399-82477-1 3 136.17 45.39
+0-201-78345-X 3 60 20
+0-201-78345-X 2 50 25
 ```
 
 ## 练习1.21
 
 > 编写程序，读取两个 ISBN 相同的 Sales_item 对象，输出他们的和。
 
+解答：
 ```c++
+#include <iostream>
+#include "Sales_item.h"
 
+int main()
+{
+    Sales_item item1, item2, sum;
+    std::cin >> item1 >> item2;
+    sum = item1 + item2;
+    std::cout << sum << std::endl;
+    return 0;
+}
+```
+
+CMD中输入：
+```
+g++ exercise_1.21.cpp -o exercise_1.21.exe
+exercise_1.21 <add_item.txt >e1.21outfile.txt
+```
+
+e1.21outfile.txt中输出：
+```
+0-201-78345-X 5 110 22
 ```
 
 ## 练习1.22
 
 > 编写程序，读取多个具有相同 ISBN 的销售记录，输出所有记录的和。
 
+解答：
 ```c++
+#include <iostream>
+#include "Sales_item.h"
 
+int main()
+{
+    Sales_item item_sum;
+    // 注意要把第一个输入item_sum，不然item_sum没有书号
+    std::cin >> item_sum;
+    for(Sales_item item; std::cin >> item; ){
+        item_sum += item;
+    }
+    std::cout << "Sum of all items: " << item_sum << std::endl;
+    return 0;
+}
+```
+
+CMD中输入：
+```
+g++ exercise_1.22.cpp -o exercise_1.22.exe
+exercise_1.22 <sum_item.txt >e1.22outfile.txt
+```
+
+e1.22outfile.txt中输出：
+```
+Sum of all items: 0-201-78345-X 24 645 26.875
 ```
 
 ## 练习1.23
 
 > 编写程序，读取多条销售记录，并统计每个 ISBN（每本书）有几条销售记录。
 
+解答：
 ```c++
+#include <iostream>
+#include "Sales_item.h"
 
+int main()
+{
+    int cnt = 0;
+    Sales_item item_sum, current_item, item;
+    std::cin >> current_item;
+    item_sum = current_item;
+    cnt = 1;
+    while(std::cin >> item){
+        if(current_item.isbn() == item.isbn()){
+            cnt++;
+            item_sum += item;
+        }
+        else{
+            std::cout << item_sum << " count = " << cnt << std::endl;
+            current_item = item;
+            item_sum = item;
+            cnt = 1;
+        }
+    }
+    std::cout << item_sum << " count = " << cnt << std::endl;
+
+    return 0;
+}
 ```
 
 ## 练习1.24
 
 > 输入表示多个 ISBN 的多条销售记录来测试上一个程序，每个 ISBN 的记录应该聚在一起。
 
+解答：
+CMD中输入：
+```
+g++ exercise_1.23_1.24.cpp -o exercise_1.23_1.24.exe 
+exercise_1.23_1.24 <book_sales.txt >e1.24outfile.txt
+```
 
-```c++
-
+e1.24outfile.txt 中输出：
+```
+0-201-70353-X 4 99.96 24.99 count = 1
+0-201-82470-1 4 181.56 45.39 count = 1
+0-201-88954-4 16 198 12.375 count = 4
+0-399-82477-1 5 226.95 45.39 count = 2
+0-201-78345-X 5 110 22 count = 2
 ```
 
 ## 练习1.25
@@ -483,5 +658,43 @@ int main()
 
 
 ```c++
+#include <iostream>
+#include "Sales_item.h"
 
+int main()
+{
+    Sales_item total;
+    if(std::cin >> total){
+        Sales_item trans;
+        while(std::cin >> trans){
+            if(total.isbn() == trans.isbn())
+                total += trans;
+            else{
+                std::cout << total << std::endl;
+                total = trans;
+            }
+        }
+        std::cout << total << std::endl;
+    }
+    else{
+        std::cerr << "No data?!" << std::endl;
+        return -1;
+    }
+    return 0;
+}
+```
+
+CMD中输入：
+```
+g++ exercise_1.25.cpp -o exercise_1.25.exe
+exercise_1.25 <book_sales.txt >e1.25outfile.txt
+```
+
+e1.25outfile.txt 中输出：
+```
+0-201-70353-X 4 99.96 24.99
+0-201-82470-1 4 181.56 45.39
+0-201-88954-4 16 198 12.375
+0-399-82477-1 5 226.95 45.39
+0-201-78345-X 5 110 22
 ```
